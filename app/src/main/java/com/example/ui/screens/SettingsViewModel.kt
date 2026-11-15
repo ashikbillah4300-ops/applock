@@ -103,12 +103,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun setHideNotificationContent(enabled: Boolean) {
-        viewModelScope.launch {
-            settingsDataStore.setHideNotificationContent(enabled)
-        }
-    }
-
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch {
             settingsDataStore.setThemeMode(mode)
@@ -161,6 +155,4 @@ class SettingsViewModel @Inject constructor(
         permissionsHelper.deactivateDeviceAdmin()
         refresh()
     }
-
-    fun notificationListenerIntent(): Intent = permissionsHelper.createNotificationListenerIntent()
 }

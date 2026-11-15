@@ -56,7 +56,6 @@ data class AppSettings(
     val relockPolicy: RelockPolicy = RelockPolicy.IMMEDIATE,
     val intruderSelfieEnabled: Boolean = true,
     val fakeCrashEnabled: Boolean = false,
-    val hideNotificationContent: Boolean = false,
     val isServiceEnabled: Boolean = true,
     val themeMode: ThemeMode = ThemeMode.DARK,
     val criticalAppsSeeded: Boolean = false,
@@ -71,8 +70,7 @@ data class PermissionStatus(
     val notificationsGranted: Boolean = false,
     val batteryOptimizationIgnored: Boolean = false,
     val deviceAdminActive: Boolean = false,
-    val cameraGranted: Boolean = false,
-    val notificationListenerGranted: Boolean = false
+    val cameraGranted: Boolean = false
 ) {
     val allCoreGranted: Boolean
         get() = usageAccessGranted && overlayGranted && notificationsGranted && batteryOptimizationIgnored

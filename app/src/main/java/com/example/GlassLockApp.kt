@@ -28,20 +28,10 @@ class GlassLockApp : Application() {
             enableVibration(false)
         }
 
-        val privacyChannel = NotificationChannel(
-            CHANNEL_PRIVACY_MASKED,
-            getString(R.string.notification_channel_privacy_name),
-            NotificationManager.IMPORTANCE_DEFAULT
-        ).apply {
-            description = getString(R.string.notification_channel_privacy_desc)
-        }
-
         manager.createNotificationChannel(serviceChannel)
-        manager.createNotificationChannel(privacyChannel)
     }
 
     companion object {
         const val CHANNEL_MONITOR_SERVICE = "glasslock_monitor_service"
-        const val CHANNEL_PRIVACY_MASKED = "glasslock_privacy_masked"
     }
 }

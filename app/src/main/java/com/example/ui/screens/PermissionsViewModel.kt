@@ -35,5 +35,4 @@ class PermissionsViewModel @Inject constructor(
     fun batteryOptimizationIntent(): Intent = permissionsHelper.createBatteryOptimizationIntent()
     fun notificationSettingsIntent(): Intent = permissionsHelper.createAppNotificationSettingsIntent()
     fun deviceAdminIntent(): Intent = permissionsHelper.createEnableDeviceAdminIntent()
-    fun notificationListenerIntent(): Intent = permissionsHelper.createNotificationListenerIntent()
 }

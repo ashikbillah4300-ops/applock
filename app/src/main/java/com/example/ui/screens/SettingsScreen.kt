@@ -38,7 +38,6 @@ import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Gesture
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.LockReset
-import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Pin
 import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material.icons.filled.Security
@@ -325,26 +324,6 @@ fun SettingsScreen(
                         checked = state.settings.fakeCrashEnabled,
                         testTag = "settings_fake_crash_switch",
                         onCheckedChange = { viewModel.setFakeCrashEnabled(it) }
-                    )
-
-                    SettingsSwitchRow(
-                        icon = Icons.Filled.NotificationsOff,
-                        title = "Hide Locked Notification Content",
-                        subtitle = if (state.permissions.notificationListenerGranted) {
-                            "Masks message previews for locked apps"
-                        } else {
-                            "Tap to grant Notification Access"
-                        },
-                        checked = state.settings.hideNotificationContent && state.permissions.notificationListenerGranted,
-                        testTag = "settings_hide_notif_switch",
-                        onCheckedChange = { enable ->
-                            if (enable && !state.permissions.notificationListenerGranted) {
-                                viewModel.setHideNotificationContent(true)
-                                runCatching { context.startActivity(viewModel.notificationListenerIntent()) }
-                            } else {
-                                viewModel.setHideNotificationContent(enable)
-                            }
-                        }
                     )
 
                     SettingsSwitchRow(

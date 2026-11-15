@@ -31,8 +31,7 @@ class PermissionsHelper @Inject constructor(
             notificationsGranted = isNotificationsGranted(),
             batteryOptimizationIgnored = isIgnoringBatteryOptimizations(),
             deviceAdminActive = isDeviceAdminActive(),
-            cameraGranted = isCameraGranted(),
-            notificationListenerGranted = isNotificationListenerGranted()
+            cameraGranted = isCameraGranted()
         )
     }
 
@@ -91,11 +90,6 @@ class PermissionsHelper @Inject constructor(
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun isNotificationListenerGranted(): Boolean {
-        val enabledPackages = NotificationManagerCompat.getEnabledListenerPackages(context)
-        return enabledPackages.contains(context.packageName)
-    }
-
     fun createUsageAccessIntent(): Intent =
         Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -120,11 +114,6 @@ class PermissionsHelper @Inject constructor(
     fun createAppNotificationSettingsIntent(): Intent =
         Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
             putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-
-    fun createNotificationListenerIntent(): Intent =
-        Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 

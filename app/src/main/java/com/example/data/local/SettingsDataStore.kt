@@ -37,7 +37,6 @@ class SettingsDataStore @Inject constructor(
                 ?: RelockPolicy.IMMEDIATE,
             intruderSelfieEnabled = prefs[KEY_INTRUDER_SELFIE] ?: true,
             fakeCrashEnabled = prefs[KEY_FAKE_CRASH] ?: false,
-            hideNotificationContent = prefs[KEY_HIDE_NOTIFICATIONS] ?: false,
             isServiceEnabled = prefs[KEY_SERVICE_ENABLED] ?: true,
             themeMode = prefs[KEY_THEME_MODE]
                 ?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() }
@@ -71,10 +70,6 @@ class SettingsDataStore @Inject constructor(
         context.glassLockDataStore.edit { it[KEY_FAKE_CRASH] = enabled }
     }
 
-    suspend fun setHideNotificationContent(enabled: Boolean) {
-        context.glassLockDataStore.edit { it[KEY_HIDE_NOTIFICATIONS] = enabled }
-    }
-
     suspend fun setServiceEnabled(enabled: Boolean) {
         context.glassLockDataStore.edit { it[KEY_SERVICE_ENABLED] = enabled }
     }
@@ -105,7 +100,6 @@ class SettingsDataStore @Inject constructor(
         private val KEY_RELOCK_POLICY = stringPreferencesKey("relock_policy")
         private val KEY_INTRUDER_SELFIE = booleanPreferencesKey("intruder_selfie_enabled")
         private val KEY_FAKE_CRASH = booleanPreferencesKey("fake_crash_enabled")
-        private val KEY_HIDE_NOTIFICATIONS = booleanPreferencesKey("hide_notification_content")
         private val KEY_SERVICE_ENABLED = booleanPreferencesKey("service_enabled")
         private val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
         private val KEY_CRITICAL_APPS_SEEDED = booleanPreferencesKey("critical_apps_seeded")
