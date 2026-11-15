@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">GlassLock</string>
+    <string name="disguise_calculator_name">Calculator</string>
+    <string name="device_admin_label">GlassLock Uninstall Protection</string>
+    <string name="device_admin_description">Prevents unauthorized uninstallation or force-stopping of GlassLock to keep your protected apps secure.</string>
+    <string name="notification_channel_service_name">Background Service</string>
+    <string name="notification_channel_service_desc">Silent low-priority service notification.</string>
+    <string name="notification_channel_privacy_name">Masked App Notifications</string>
+    <string name="notification_channel_privacy_desc">Privacy-masked notifications for locked apps.</string>
+</resources>

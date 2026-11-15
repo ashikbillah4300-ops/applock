@@ -1,0 +1,6 @@
+{
+  "name": "GlassLock",
+  "description": "Glassmorphic Android App Lock with PIN, pattern, biometrics, intruder selfie, and privacy shields.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
