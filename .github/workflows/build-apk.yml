@@ -29,30 +29,54 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          accept-android-sdk-licenses: true
+          packages: |
+            platform-tools
+            build-tools;36.0.0
+
+      - name: Install Android 36.1 SDK Platform & Accept Licenses
+        run: |
+          SDK_MANAGER="${ANDROID_HOME:-$ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDK_MANAGER" ]; then
+            SDK_MANAGER="$(command -v sdkmanager || true)"
+          fi
+          if [ -n "$SDK_MANAGER" ]; then
+            yes | "$SDK_MANAGER" --licenses >/dev/null 2>&1 || true
+            "$SDK_MANAGER" --install "platform-tools" "build-tools;36.0.0" "platforms;android-36.1" || \
+              "$SDK_MANAGER" --install "platform-tools" "build-tools;36.0.0" "platforms;android-36"
+          fi
 
       - name: Set up Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "9.3.1"
 
-      - name: Restore debug keystore
+      - name: Ensure Gradle 9.3.1 CLI is on PATH
+        run: |
+          if ! command -v gradle >/dev/null 2>&1; then
+            echo "Downloading Gradle 9.3.1..."
+            curl -fsSL https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -o /tmp/gradle-9.3.1-bin.zip
+            unzip -q /tmp/gradle-9.3.1-bin.zip -d /opt
+            echo "/opt/gradle-9.3.1/bin" >> "$GITHUB_PATH"
+          fi
+
+      - name: Restore or generate debug keystore
         run: |
           if [ -f debug.keystore.base64 ]; then
             base64 -d debug.keystore.base64 > debug.keystore
           elif [ ! -f debug.keystore ]; then
-            keytool -genkeypair -v -keystore debug.keystore \
+            keytool -genkeypair -noprompt -v -keystore debug.keystore \
               -storepass android -alias androiddebugkey -keypass android \
               -keyalg RSA -keysize 2048 -validity 10000 \
               -dname "CN=Android Debug,O=Android,C=US"
           fi
-
-      - name: Run unit & Robolectric tests
-        run: gradle :app:testDebugUnitTest --no-daemon
+          ls -lh debug.keystore
 
       - name: Build Debug APK
-        run: gradle :app:assembleDebug --no-daemon
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
 
-      - name: Prepare APK artifacts
+      - name: Prepare Debug APK artifact
         run: |
           mkdir -p dist
           cp app/build/outputs/apk/debug/app-debug.apk dist/GlassLock-debug.apk
@@ -66,18 +90,23 @@ jobs:
         run: |
           if [ -n "$RELEASE_KEYSTORE_BASE64" ] && [ -n "$STORE_PASSWORD" ] && [ -n "$KEY_PASSWORD" ]; then
             echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
-            gradle :app:assembleRelease --no-daemon
+            gradle :app:assembleRelease --no-daemon --stacktrace
             cp app/build/outputs/apk/release/app-release.apk dist/GlassLock-release.apk
             rm -f "$KEYSTORE_PATH"
           else
             echo "Release signing secrets not configured; skipping release APK."
           fi
 
+      - name: Run unit & Robolectric tests
+        run: gradle :app:testDebugUnitTest --no-daemon --stacktrace
+
       - name: Upload APK Artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: GlassLock-APKs
           path: dist/*.apk
+          if-no-files-found: error
           retention-days: 30
 
       - name: Create GitHub Release (on v* tag push)
