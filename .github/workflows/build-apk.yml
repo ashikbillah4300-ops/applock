@@ -26,47 +26,40 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+          cache: gradle
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          accept-android-sdk-licenses: true
-          packages: |
-            platform-tools
-            build-tools;36.0.0
-
-      - name: Install Android 36.1 SDK Platform & Accept Licenses
+      - name: Set up Android SDK & Licenses
         run: |
-          SDK_MANAGER="${ANDROID_HOME:-$ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager"
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+
+          SDK_MANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
           if [ ! -x "$SDK_MANAGER" ]; then
-            SDK_MANAGER="$(command -v sdkmanager || true)"
+            SDK_MANAGER="$(find "$SDK_ROOT" -name sdkmanager \( -type f -o -type l \) 2>/dev/null | head -n 1 || true)"
           fi
-          if [ -n "$SDK_MANAGER" ]; then
+          echo "Using sdkmanager: $SDK_MANAGER"
+
+          if [ -n "$SDK_MANAGER" ] && [ -x "$SDK_MANAGER" ]; then
             yes | "$SDK_MANAGER" --licenses >/dev/null 2>&1 || true
             "$SDK_MANAGER" --install "platform-tools" "build-tools;36.0.0" "platforms;android-36.1" || \
               "$SDK_MANAGER" --install "platform-tools" "build-tools;36.0.0" "platforms;android-36"
           fi
 
-      - name: Set up Gradle 9.3.1
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "9.3.1"
-
-      - name: Ensure Gradle 9.3.1 CLI is on PATH
+      - name: Install Gradle 9.3.1
         run: |
-          if ! command -v gradle >/dev/null 2>&1; then
-            echo "Downloading Gradle 9.3.1..."
-            curl -fsSL https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -o /tmp/gradle-9.3.1-bin.zip
-            unzip -q /tmp/gradle-9.3.1-bin.zip -d /opt
-            echo "/opt/gradle-9.3.1/bin" >> "$GITHUB_PATH"
-          fi
+          curl -fsSL https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -o /tmp/gradle-9.3.1-bin.zip
+          mkdir -p "$HOME/.gradle-dist"
+          unzip -q -o /tmp/gradle-9.3.1-bin.zip -d "$HOME/.gradle-dist"
+          rm -f /tmp/gradle-9.3.1-bin.zip
+          echo "$HOME/.gradle-dist/gradle-9.3.1/bin" >> "$GITHUB_PATH"
 
       - name: Restore or generate debug keystore
         run: |
           if [ -f debug.keystore.base64 ]; then
             base64 -d debug.keystore.base64 > debug.keystore
           elif [ ! -f debug.keystore ]; then
-            keytool -genkeypair -noprompt -v -keystore debug.keystore \
+            keytool -genkeypair -noprompt -keystore debug.keystore \
               -storepass android -alias androiddebugkey -keypass android \
               -keyalg RSA -keysize 2048 -validity 10000 \
               -dname "CN=Android Debug,O=Android,C=US"
@@ -74,7 +67,9 @@ jobs:
           ls -lh debug.keystore
 
       - name: Build Debug APK
-        run: gradle :app:assembleDebug --no-daemon --stacktrace
+        run: |
+          gradle --version
+          gradle :app:assembleDebug --no-daemon --stacktrace
 
       - name: Prepare Debug APK artifact
         run: |
