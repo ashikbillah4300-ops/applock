@@ -22,12 +22,13 @@ This repository includes a GitHub Actions workflow that automatically runs unit/
    git remote add origin https://github.com/<your-username>/<your-repo>.git
    git push -u origin main
    ```
-2. Open your repository on GitHub and go to the **Actions** tab.
-3. Click the latest **Build GlassLock APK** workflow run and download **`GlassLock-APKs`** from the **Artifacts** section (`GlassLock-debug.apk`).
+2. Once the **Build GlassLock APK** workflow completes:
+   - **Direct APK in Releases (recommended):** Open the **Releases** section on the right sidebar of your GitHub repository → click **GlassLock Latest APK** → download `GlassLock-debug.apk` directly under **Assets**.
+   - **Workflow Artifacts:** Or go to **Actions** → latest **Build GlassLock APK** run → download **`GlassLock-APKs`**.
 
-### Automatic GitHub Releases (Optional)
+### Versioned Releases (Optional)
 
-To attach `.apk` files directly under the GitHub **Releases** page, push a version tag:
+To publish a separate numbered release (e.g. `v1.0.0`), push a tag:
 
 ```bash
 git tag v1.0.0
